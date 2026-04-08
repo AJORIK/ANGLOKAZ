@@ -5,9 +5,10 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 BASE_DIR = Path(__file__).resolve().parent
-IMAGE_PATH = BASE_DIR / "assets" / "post.jpg"
+IMAGE_PATH = BASE_DIR / "post.jpg"
 
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+URL = "https://lud.su/Shafle"
 
 POST_CAPTION = """
 🚨 $100K WEEKLY RACE 🚨
@@ -31,16 +32,19 @@ POST_CAPTION = """
 ⏳ Limited access, don’t miss out 🔗 <a href="https://lud.su/Shafle">Claim here</a>
 """
 
-URL = "https://lud.su/Shafle"
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    keyboard = [
-        [
-            InlineKeyboardButton("▶️ Play", url=URL),
-            InlineKeyboardButton("500%", url=URL),
-        ]
-    ]
+    keyboard = [[
+        InlineKeyboardButton("▶️ Play", url=URL),
+        InlineKeyboardButton("500%", url=URL),
+    ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
+
+    if not IMAGE_PATH.exists():
+        await update.message.reply_text(
+            f"Файл изображения не найден: {IMAGE_PATH.name}",
+            reply_markup=reply_markup
+        )
+        return
 
     with open(IMAGE_PATH, "rb") as photo:
         await update.message.reply_photo(
